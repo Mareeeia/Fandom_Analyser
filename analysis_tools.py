@@ -54,6 +54,26 @@ class FandomAnalysisTools:
             df = df[is_large]
         return df['Characters'].values
 
+    def get_top_tags(self, d, count=0):
+        df = pd.DataFrame.from_dict(d, orient='index')
+        df = df['tags'].explode().value_counts().rename_axis('Tags').reset_index(name='Fanfic Counts')
+        is_large = df['Fanfic Counts'] > 3
+        if count > 0:
+            df = df.head(count)
+        else:
+            df = df[is_large]
+        return df['Tags'].values
+
+    def get_top_ships(self, d, count=0):
+        df = pd.DataFrame.from_dict(d, orient='index')
+        df = df['relationships'].explode().value_counts().rename_axis('Ships').reset_index(name='Fanfic Counts')
+        is_large = df['Fanfic Counts'] > 3
+        if count > 0:
+            df = df.head(count)
+        else:
+            df = df[is_large]
+        return df['Ships'].values
+
 
     def plot_new_works_count_by_month(self, d):
         dates_work_count = {}

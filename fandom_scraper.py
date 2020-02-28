@@ -276,8 +276,11 @@ class Fandom:
         characters = {}
         if len(chars) == 0:
             chars = self.fandom_page.find("div", {"class": "characters listbox group"})
-        for char in chars:
+        for i, char in enumerate(chars):
             characters[char] = self.get_character_variants(char)
+            self.progress(i, len(chars))
+
+        print("Finished getting %i characters." % (len(characters)))
         return characters
 
     def get_character_variants(self, char):
@@ -294,39 +297,62 @@ class Fandom:
     def clean_char_name(self, char):
         return char.strip()
 
-    def get_all_fandom_ships(self):
+    def get_all_fandom_ships(self, ships=[]):
         print("Scraping ships from fandom page. We do this to ensure all versions of a ship name count as the same ship.")
         relationships = {}
-        ships_li = self.fandom_page.find("div", {"class": "relationships listbox group"})
-        for ship in ships_li:
-            relationships[ship] = self.get_relationship_variants(ship)
+        if len(ships)==0:
+            ships = self.fandom_page.find("div", {"class": "relationships listbox group"})
+        for ship in ships:
+            relationships[ship] = self.get_ship_variants(ship)
+        print("Finished getting %i ships." % (len(relationships)))
+        return relationships
 
     def get_ship_variants(self, ship):
         ship_page = self.request("https://archiveofourown.org/tags/%s" % (ship))
-        variants_li = ship_page.find()
+        variants_div = ship_page.find("div", {"class": "synonym listbox group"})
         variants = []
-        for var in variants_li:
-            variants.add(self.process_ship_name(var))
+        if variants_div:
+            variants_li = variants_div.ul
+            for var in variants_li:
+                variants.append(self.clean_ship_name(var.string))
         return variants
 
-    def process_ship_name(self, ship):
+    def clean_ship_name(self, ship):
         return ship.strip()
 
-    def get_all_fandom_tags(self):
+    def clean_tag_name(self, tag):
+        return tag.strip()
+
+    def get_all_fandom_tags(self, tags=[]):
         print("Scraping freeform tags from fandom page. We do this to ensure all versions of a tag count as the same tag.")
-        tags = {}
-        tags_li = self.fandom_page.find("div", {"class": "freeforms listbox group"})
-        for tag in tags_li:
-            tags[tag] = self.get_tag_variants(tag)
+        tags_dict = {}
+        if len(tags) == 0:
+            tags = self.fandom_page.find("div", {"class": "freeforms listbox group"})
+        for i, tag in enumerate(tags):
+            tags_dict[tag] = self.get_tag_variants(tag)
+            self.progress(i, len(tags))
+        print("Finished getting %i tags." % (len(tags_dict)))
+        return tags_dict
 
     def get_tag_variants(self, tag):
         tag_page = self.request("https://archiveofourown.org/tags/%s" % (tag))
-        variants_li = tag_page.find()
+        variants_div = tag_page.find("div", {"class": "synonym listbox group"})
         variants = []
-        for var in variants_li:
-            variants.add(self.process_tag_name(var))
+        if variants_div:
+            variants_li = variants_div.ul
+            for var in variants_li:
+                variants.append(self.clean_tag_name(var.string))
         return variants
 
+    def progress(self, count, total, status=''):
+        bar_len = 60
+        filled_len = int(round(bar_len * count / float(total)))
+
+        percents = round(100.0 * count / float(total), 1)
+        bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+        sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+        sys.stdout.flush()
 
     @property
     def url(self):
@@ -338,14 +364,14 @@ class Fandom:
         success = False
         while not success:
             try:
-                req = requests.get(url)
+                req = requests.get(url, timeout=5)
                 content = req.content
                 soup = BeautifulSoup(content, "html.parser")
                 success = True
                 return soup
             except Exception as e:
                 print("Beep")
-                wait = retries * 30
+                wait = retries * 60
                 print('Error! Waiting %s secs and re-trying...' % wait)
                 sys.stdout.flush()
                 time.sleep(wait)

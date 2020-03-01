@@ -1,5 +1,7 @@
 from fandom_scraper import Fandom
 import json
+import pprint
+import database_utils as utils
 from pathlib import Path
 from analysis_tools import FandomAnalysisTools
 
@@ -12,8 +14,9 @@ from analysis_tools import FandomAnalysisTools
 
 
 def extract_works_metadata(fandom, p):
-
     dict = fandom.get_full_works_metadata()
+    dict = utils.ships_to_chars(dict)
+    print(dict)
     with open((p / 'works.json'), 'w') as f:
         json.dump(dict, f)
 
@@ -25,33 +28,39 @@ def make_fandom_vars(fandom_name):
     fan.prepare_analytics_folders()
     return fnd, fan, p
 
-def process_data_files():
-    print("Processing names to minimise duplication.")
+def process_data_files(fandom_name):
+    print("Processing character names to minimise duplication.")
+    with open("fandom_extracted_data/" + fandom_name + "/characters.json") as f_c:
+        d = json.load(f_c)
+        d = utils.dedup_dict(d)
+        d = utils.dedup_char_fandom(d)
+        with open("fandom_extracted_data/" + fandom_name + "/characters.json", 'w') as w_c:
+            json.dump(d, w_c)
+    print("Processing tag names to minimise duplication.")
+    with open("fandom_extracted_data/" + fandom_name + "/tags.json") as f_t:
+        d = json.load(f_t)
+        d = utils.dedup_dict(d)
+        with open("fandom_extracted_data/" + fandom_name + "/tags.json", 'w') as w_t:
+            json.dump(d, w_t)
+    print("Processing relationships to minimise duplication.")
+    with open("fandom_extracted_data/" + fandom_name + "/characters.json") as f_c:
+        charlist = json.load(f_c)
+        with open("fandom_extracted_data/" + fandom_name + "/ships.json") as f_s:
+            d = json.load(f_s)
+            d = utils.dedup_dict(d)
+            print(d)
+            d = utils.dedup_ship_fandom(d, charlist)
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(d)
 
-def extract_tag_varians():
-    return tags
 
 
-def extract_character_varians():
-    return characters
-
-def extract_ship_variants():
-    return ships
-
-def main():
-    fandom_name = '龍が如く%20%7C%20Ryuu%20ga%20Gotoku%20%7C%20Yakuza%20(Video%20Games)'
-    fnd, fan, p = make_fandom_vars(fandom_name)
-    # extract_works_metadata(fnd, p)
+def get_chars_ships_tags_variants(fan, fnd, fandom_name):
     with open("fandom_extracted_data/" + fandom_name + "/works.json") as f:
         d = json.load(f)
         tags_raw = fan.get_top_tags(d)
         chars_raw = fan.get_top_characters(d)
         ships_raw = fan.get_top_ships(d)
-        fan.prepare_analytics_folders()
-        fan.do_analysis(d)
-        # print(ships_raw)
-        # print(chars_raw)
-        # print(tags_raw)
         chars = fnd.get_all_fandom_characters(chars_raw)
         with open("fandom_extracted_data/" + fandom_name + "/characters.json", 'w') as f_c:
             json.dump(chars, f_c)
@@ -59,8 +68,18 @@ def main():
         with open("fandom_extracted_data/" + fandom_name + "/tags.json", 'w') as f_t:
             json.dump(tags, f_t)
         ships = fnd.get_all_fandom_ships(ships_raw)
+        print(ships)
         with open("fandom_extracted_data/" + fandom_name + "/ships.json", 'w') as f_s:
             json.dump(ships, f_s)
+
+def main():
+    fandom_name = 'What We Do in the Shadows (2014)'
+    fnd, fan, p = make_fandom_vars(fandom_name)
+    extract_works_metadata(fnd, p)
+    get_chars_ships_tags_variants(fan, fnd, fandom_name)
+    # fan.prepare_analytics_folders()
+    # fan.do_analysis(d)
+    process_data_files(fandom_name)
 
 if __name__== "__main__":
     main()

@@ -372,7 +372,7 @@ class Fandom:
             except Exception as e:
                 print("Beep")
                 wait = retries * 60
-                print('Error! Waiting %s secs and re-trying...' % wait)
+                print('Oops, we sent too many requests to Ao3! Waiting %s secs and re-trying...' % wait)
                 sys.stdout.flush()
                 time.sleep(wait)
                 retries += 1

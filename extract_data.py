@@ -44,14 +44,27 @@ def process_data_files(fandom_name):
             json.dump(d, w_t)
     print("Processing relationships to minimise duplication.")
     with open("fandom_extracted_data/" + fandom_name + "/characters.json") as f_c:
-        charlist = json.load(f_c)
+        char_dict = json.load(f_c)
         with open("fandom_extracted_data/" + fandom_name + "/ships.json") as f_s:
             d = json.load(f_s)
             d = utils.dedup_dict(d)
             print(d)
-            d = utils.dedup_ship_fandom(d, charlist)
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(d)
+            d = utils.dedup_ship_fandom(d, char_dict)
+            with open("fandom_extracted_data/" + fandom_name + "/ships.json", 'w') as w_s:
+                json.dump(d, w_s)
+
+def process_works_file(d, fandom_name):
+    with open("fandom_extracted_data/" + fandom_name + "/characters.json") as f_c:
+        with open("fandom_extracted_data/" + fandom_name + "/tags.json") as f_t:
+            with open("fandom_extracted_data/" + fandom_name + "/ships.json") as f_s:
+                char_dict = json.load(f_c)
+                tag_dict = json.load(f_t)
+                ship_dict = json.load(f_s)
+                utils.process_dict(d, char_dict, tag_dict, ship_dict)
+                pp = pprint.PrettyPrinter(indent=4)
+                pp.pprint(d)
+                with open("fandom_extracted_data/" + fandom_name + "/works.json", 'w') as w_w:
+                    json.dump(d, w_w)
 
 
 
@@ -75,11 +88,14 @@ def get_chars_ships_tags_variants(fan, fnd, fandom_name):
 def main():
     fandom_name = 'What We Do in the Shadows (2014)'
     fnd, fan, p = make_fandom_vars(fandom_name)
-    extract_works_metadata(fnd, p)
-    get_chars_ships_tags_variants(fan, fnd, fandom_name)
-    # fan.prepare_analytics_folders()
-    # fan.do_analysis(d)
+    # extract_works_metadata(fnd, p)
+    # get_chars_ships_tags_variants(fan, fnd, fandom_name)
     process_data_files(fandom_name)
+    with open("fandom_extracted_data/" + fandom_name + "/works.json") as f:
+        d = json.load(f)
+        process_works_file(d, fandom_name)
+        fan.prepare_analytics_folders()
+        fan.do_analysis(d)
 
 if __name__== "__main__":
     main()

@@ -18,7 +18,8 @@ def dedup_dict(tag_dict):
             junk.extend(overlap)
     print("Duplicate tags found and will be deleted: " + str(junk))
     for entry in junk:
-        tag_dict.pop(entry)
+        if entry in tag_dict.keys():
+            tag_dict.pop(entry)
     return tag_dict
 
 def find_overlap(key_isdup, dict):
@@ -101,9 +102,36 @@ def filter_name(name, d):
             return key
     return 'junk'
 
-def process_dict(d):
+def standardize_char_names(charlist, char_dict):
+    result_list = []
+    for char in charlist:
+        for char_name in char_dict.keys():
+            if (char in char_dict[char_name] or char.casefold() == char_name.casefold()) and char not in result_list:
+                result_list.append(char_name)
+    return result_list
 
-    dedup_dict(d)
-    print(d)
-    # dedup(array)
-    # filter_name()
+def standardize_tags(taglist, tag_dict):
+    result_list = []
+    for tag in taglist:
+        for tag_name in tag_dict.keys():
+            if (tag in tag_dict[tag_name] or tag.casefold() == tag_name.casefold()) and tag not in result_list:
+                result_list.append(tag_name)
+    return result_list
+
+def standardize_ships(shiplist, ship_dict):
+    result_list = []
+    for ship in shiplist:
+        for ship_name in ship_dict.keys():
+            if (ship in ship_dict[ship_name] or ship.casefold() == ship_name.casefold()) and ship not in result_list:
+                result_list.append(ship_name)
+    return result_list
+
+
+
+def process_dict(d, char_dict, tag_dict, ship_dict):
+    for work in d.keys():
+        d[work]['characters'] = standardize_char_names(d[work]['characters'], char_dict)
+        d[work]['tags'] = standardize_tags(d[work]['tags'], tag_dict)
+        d[work]['relationships'] = standardize_ships(d[work]['relationships'], ship_dict)
+    return d
+

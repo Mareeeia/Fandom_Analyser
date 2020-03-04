@@ -57,7 +57,7 @@ class FandomAnalysisTools:
     def get_top_tags(self, d, count=0):
         df = pd.DataFrame.from_dict(d, orient='index')
         df = df['tags'].explode().value_counts().rename_axis('Tags').reset_index(name='Fanfic Counts')
-        is_large = df['Fanfic Counts'] > 3
+        is_large = df['Fanfic Counts'] > 0
         if count > 0:
             df = df.head(count)
         else:
@@ -218,10 +218,10 @@ class FandomAnalysisTools:
     def plot_works_count_by_character(self, d):
         df = pd.DataFrame.from_dict(d).T
         df = df['characters'].explode().value_counts().rename_axis('Characters').reset_index(name='Fanfic Counts')
-        is_large = df['Fanfic Counts'] > 3
+        # is_large = df['Fanfic Counts'] > 0
         plt.rc('font', size=8)
         plt.rc('axes', titlesize=8)
-        df[is_large].plot(x='Characters', kind='bar', figsize=(20, 8))
+        df.plot(x='Characters', kind='bar', figsize=(20, 8))
         plt.axhline(y=df[is_large]['Fanfic Counts'].mean(), color='r', linestyle='-')
         plt.draw()
         plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_character.png')

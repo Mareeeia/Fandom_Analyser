@@ -111,7 +111,8 @@ class Fandom:
     def get_title(self, soup, id):
         title = soup.find("h4", {'class': 'heading'})
         try:
-            title = title.a.text
+            title = title.a.t
+
         except:
             print('Warning: Work id ' + id + ' has no displayed title.')
             title = "Untitled"

@@ -1,0 +1,6 @@
+pandas~=1.1.4
+matplotlib~=3.3.3
+networkx~=2.5
+requests~=2.25.0
+beautifulsoup4~=4.9.3
+stem~=1.8.0

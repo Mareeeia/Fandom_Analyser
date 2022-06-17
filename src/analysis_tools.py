@@ -3,6 +3,7 @@ import pandas as pd
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
+from src.params.folder_params import *
 import matplotlib.dates as mdates
 import networkx as nx
 from pathlib import Path
@@ -11,6 +12,7 @@ from pathlib import Path
 class FandomAnalysisTools:
 
     logger_analysis = logging.getLogger("analysis")
+    logging.basicConfig(level=LOG_LEVEL)
 
     VALID_CATEGORIES = []
     VALID_CHARACTERS = []
@@ -77,7 +79,7 @@ class FandomAnalysisTools:
         self.logger_analysis.info('Plotting full network')
 
     def prepare_analytics_folders(self):
-        ppath = Path('./fandom_extracted_data/' + self.fandom + '/plots')
+        ppath = Path(ROOT_DIR + FILES_ROOT + self.fandom + '/plots')
         ppath.mkdir(exist_ok=True)
 
     def get_top_characters(self, d, count=0):
@@ -124,7 +126,7 @@ class FandomAnalysisTools:
 
         plt.axhline(y=df['count'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_new_works_count_by_month.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_new_works_count_by_month.png')
         plt.show()
 
     def plot_new_works_count_by_month_ratings(self, d):
@@ -167,7 +169,7 @@ class FandomAnalysisTools:
         plt.legend(ps, categories)
         # plt.axhline(y=df['count'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('../src/fandom_extracted_data/' + self.fandom + '/plots/plot_new_works_count_by_month.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_new_works_count_by_month.png')
         plt.show()
 
     def plot_chars_ratings(self, d):
@@ -235,7 +237,7 @@ class FandomAnalysisTools:
         df.plot(x='Characters', kind='bar', figsize=(20, 8))
         plt.axhline(y=df[is_large]['Fanfic Counts'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_character.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_character.png')
         plt.show()
 
     def plot_works_count_by_ship(self, d):
@@ -252,7 +254,7 @@ class FandomAnalysisTools:
         plt.subplots_adjust(bottom=0.3)
         plt.axhline(y=df['Fanfic Counts'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_ship.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_ship.png')
         plt.show()
 
     def plot_works_count_by_main_character(self, d):
@@ -265,7 +267,7 @@ class FandomAnalysisTools:
         df[is_large].plot(x='Main Characters', kind='bar', figsize=(20, 8))
         plt.axhline(y=df[is_large]['Fanfic Counts'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_main_character.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_main_character.png')
         plt.show()
 
     def plot_average_hits_character(self, data):
@@ -303,7 +305,7 @@ class FandomAnalysisTools:
         plt.subplots_adjust(bottom=0.3)
         plt.draw()
         plt.savefig(
-            'fandom_extracted_data/' + self.fandom + '/plots/plot_average_hits_ships_character_' + char + '.png')
+            ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_average_hits_ships_character_' + char + '.png')
         plt.show()
 
     def plot_average_likes_character(self, data):
@@ -319,7 +321,7 @@ class FandomAnalysisTools:
         df[is_large]['ratio'].plot(kind='bar')
         plt.axhline(y=df[is_large]['ratio'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_average_likes_character.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_average_likes_character.png')
         plt.show()
 
     def make_autopct(self, values):
@@ -343,7 +345,7 @@ class FandomAnalysisTools:
         plt.axis('off')
         plt.title(self.fandom + " Fanfic Rating Split", bbox={'facecolor': '0.8', 'pad': 5})
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_rating.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_rating.png')
         plt.show()
 
     def plot_works_count_by_category(self, d):
@@ -356,7 +358,7 @@ class FandomAnalysisTools:
                    bbox_transform=plt.gcf().transFigure)
         plt.axis('off')
         plt.draw()
-        plt.savefig('../src/fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_category.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_category.png')
         plt.show()
 
     def plot_works_count_by_tag(self, d):
@@ -366,7 +368,7 @@ class FandomAnalysisTools:
         df.head(100).plot(x='Tags', kind='bar', figsize=(24, 8))
         plt.subplots_adjust(bottom=0.55)
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_tag.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_tag.png')
         plt.show()
 
     def plot_new_char_works_count_by_month(self, d, char, show=True):
@@ -389,7 +391,7 @@ class FandomAnalysisTools:
         plt.axhline(y=df['count'].mean(), color='r', linestyle='-')
         plt.draw()
         plt.savefig(
-            'fandom_extracted_data/' + self.fandom + '/plots/chars_bars_count/plot_new_works_count_by_month_' + char + '.png')
+            ROOT_DIR + FILES_ROOT + self.fandom + '/plots/chars_bars_count/plot_new_works_count_by_month_' + char + '.png')
         if (show):
             plt.show()
         plt.close(fig)
@@ -404,7 +406,7 @@ class FandomAnalysisTools:
         plt.rc('axes', titlesize=8)
         df[is_large]['mean'].plot(kind='bar')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_average_words_character.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_average_words_character.png')
         plt.show()
 
     # def percentage_containing_ship(self, d):
@@ -425,7 +427,7 @@ class FandomAnalysisTools:
         df = df['authors'].explode().value_counts().rename_axis('Authors').reset_index(name='Fanfic Counts')
         df.plot(x='Authors', kind='bar')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_author_variety' + char + '.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_author_variety' + char + '.png')
         plt.show()
 
     def author_champ_dedication_score(self, d, char):
@@ -438,7 +440,7 @@ class FandomAnalysisTools:
         df = df.sort_values('sum')
         df['sum'].plot(kind='bar')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/author_champ_dedication_score' + char + '.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/author_champ_dedication_score' + char + '.png')
         plt.show()
 
     def plot_champs_by_dedication_score(self, d):
@@ -466,7 +468,7 @@ class FandomAnalysisTools:
         plt.subplots_adjust(bottom=0.3)
 
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_dedication_character.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_dedication_character.png')
         plt.show()
 
     def main_character_ratio(self, d):
@@ -491,7 +493,7 @@ class FandomAnalysisTools:
         df_combined[['main_characters', 'char_difference']].plot(kind='bar', stacked=True, figsize=(24, 8))
         plt.subplots_adjust(bottom=0.3)
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_main_character_ratio.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_main_character_ratio.png')
         plt.show()
 
     def get_main_characters(self, chars, text):
@@ -515,7 +517,7 @@ class FandomAnalysisTools:
         with open('works.json') as json_file:
             d = json.load(json_file)
             for val in d.values():
-                val["main_characters"] = get_main_characters(val['characters'], val["first_page"] + val['title'])
+                val["main_characters"] = self.get_main_characters(val['characters'], val["first_page"] + val['title'])
                 self.logger_analysis.debug(val['title'] + "------" + str(val['main_characters']))
             with open('works.json', 'w') as json_file:
                 json.dump(d, json_file)
@@ -537,7 +539,7 @@ class FandomAnalysisTools:
         nx.draw_networkx_labels(G, pos, labels, font_size=10)
         plt.draw()
         plt.savefig(
-            'fandom_extracted_data/' + self.fandom + '/plots/chars_appearances/plot_character_appear_' + char + '.png')
+            ROOT_DIR + FILES_ROOT + self.fandom + '/plots/chars_appearances/plot_character_appear_' + char + '.png')
         if (show):
             plt.show()
         for entry in char_df:
@@ -573,7 +575,7 @@ class FandomAnalysisTools:
             nx.draw_networkx_labels(G, pos, labels, font_size=10)
             plt.draw()
             plt.savefig(
-                'fandom_extracted_data/' + self.fandom + '/plots/chars_ships/plot_character_ships_' + char + '.png')
+                ROOT_DIR + FILES_ROOT + self.fandom + '/plots/chars_ships/plot_character_ships_' + char + '.png')
             if (show):
                 plt.show()
             for entry in char_df:
@@ -610,7 +612,7 @@ class FandomAnalysisTools:
         labels[0] = extra
         nx.draw_networkx_labels(G, pos, labels, font_size=10)
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/chars_tags/plot_character_tags_' + char + '.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/chars_tags/plot_character_tags_' + char + '.png')
         if (show):
             plt.show()
         for entry in char_df:
@@ -656,7 +658,7 @@ class FandomAnalysisTools:
         fig, ax = plt.subplots(figsize=(80, 80))
         colors = [plt.cm.rainbow(x) for x in range(1, 256)]
         nx.draw_networkx(G, with_labels=True, node_size=np.log(df['count'].values) * 1500, edge_color=colors, width=4)
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_char_network.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_char_network.png')
         plt.show()
 
     def plot_ffnet_and_ao3(ao3, ff):
@@ -683,7 +685,7 @@ class FandomAnalysisTools:
         pa = ax.bar(df.index, df['count_x'], bottom=df['count_y'], width=25, align='center', label='Works in Archive')
         plt.legend()
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_new_works_count_by_month_sites.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_new_works_count_by_month_sites.png')
         plt.show()
 
     def plot_chars_everything(self, d):
@@ -711,7 +713,7 @@ class FandomAnalysisTools:
         df[is_large].plot(x='Characters', kind='bar', figsize=(20, 8))
         plt.axhline(y=df[is_large]['Fanfic Counts Without Explicit'].mean(), color='r', linestyle='-')
         plt.draw()
-        plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_works_count_by_character_no_lewd.png')
+        plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_character_no_lewd.png')
         plt.show()
 
     def do_analysis(self, d):

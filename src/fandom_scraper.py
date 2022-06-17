@@ -3,6 +3,7 @@ from datetime import date
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+from src.params.folder_params import *
 import time
 import re
 import math
@@ -15,6 +16,7 @@ import logging
 class Fandom:
     
     logger_fandom = logging.getLogger("fandom")
+    logging.basicConfig(level=LOG_LEVEL)
     
     def __init__(self, fandom_name):
         self.fandom = fandom_name
@@ -73,7 +75,7 @@ class Fandom:
         self.logger_fandom.info("Fandom contains " + str(self.works) + " works in " + str(pagecount) + " pages.")
         works_dict = {}
         for i in range(1, pagecount + 1):
-            self.logger_fandom.info("Currently fetching titles page: ", i)
+            self.logger_fandom.info("Currently fetching titles page: " + str(i))
             metadatas = self.get_works_metadata_page(i)
             works_dict.update(metadatas)
         return works_dict

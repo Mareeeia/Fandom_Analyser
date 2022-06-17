@@ -1,5 +1,10 @@
+import os
 
-FILES_ROOT = "./fandom_extracted_data/"
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../..'))
+
+FILES_ROOT = "/fandom_extracted_data/"
+
+LOG_LEVEL = 'INFO'
 
 RAW_CHARACTERS = "/raw/characters.json"
 

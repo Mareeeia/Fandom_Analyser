@@ -1,7 +1,10 @@
 import re
 import logging
+from src.params.folder_params import *
+
 
 logger_dedup = logging.getLogger("dedup")
+logging.basicConfig(level=LOG_LEVEL)
 
 def dedup_array(array):
     
@@ -23,7 +26,22 @@ def dedup_dict(tag_dict):
     for entry in junk:
         if entry in tag_dict.keys():
             tag_dict.pop(entry)
-    return tag_dict
+    return remove_empty_tags(tag_dict)
+
+
+def remove_empty_tags(tag_dict):
+    new_dict = {}
+    for key in tag_dict.keys():
+        if tag_dict[key] != [] or is_main(tag_dict, key):
+            new_dict[key] = tag_dict[key]
+    return new_dict
+
+
+def is_main(tag_dict, is_main):
+    for key in tag_dict.keys():
+        if is_main in tag_dict[key]:
+            return False
+    return True
 
 
 def find_overlap(key_isdup, dict):
@@ -40,7 +58,6 @@ def find_overlap(key_isdup, dict):
     for entry in overlap:
         if entry != main:
             filt_overlap.append(entry)
-
     return filt_overlap, main
 
 

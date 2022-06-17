@@ -56,8 +56,14 @@ class test_database_utils(unittest.TestCase):
                       "kitte": ["cat", "kot"],
                       "kotato": ["cat"]}
         dedup = utils.dedup_char_fandom(duplicated)
-        assert (dedup == {'cat': ['kitten', 'kot', 'ket', 'purr', 'kotato', 'kitte'],
+        assert (dedup == {'cat': ['kitten', 'kot', 'ket', 'purr', 'kotato', 'kitte', 'cat(cats)'],
                           'dog': ['pupper', 'doggo', 'doge']})
+
+    def test_dedup_char_fandom_bug(self):
+        duplicated = {"cat(cats)": ["kotato"],
+                      "kotato": []}
+        dedup = utils.dedup_char_fandom(duplicated)
+        assert (dedup == {'cat': ['kotato', 'cat(cats)']})
 
     def test_ships_to_chars(self):
         works = {"story": {"relationships": ["cat/dog"],
@@ -73,13 +79,21 @@ class test_database_utils(unittest.TestCase):
             "['cat', 'dog']": ['kitte/doge', 'purr/doggo', 'cat(cats)/dog(dogs)', 'pupper/cat(cats)'],
             "['dog', 'dog']": ['doggo/doggo']})
 
+    def test_dedup_ship_fandom_bug(self):
+        shiplist = {"cat(cats)/dog(dogs)": ['kitte/doge', 'purr/doggo'], 'doggo/doggo': [], 'pupper/kitte': []}
+        charlist = {'cat': ['kitten', 'kot', 'ket', 'purr', 'kotato', 'kitte'], 'dog': ['pupper', 'doggo', 'doge']}
+        dedup_ships = utils.dedup_ship_fandom(shiplist, charlist)
+        assert (dedup_ships == {
+            "['cat', 'dog']": ['kitte/doge', 'purr/doggo', 'cat(cats)/dog(dogs)', 'pupper/kitte'],
+            "['dog', 'dog']": ['doggo/doggo']})
+
     def test_debug_zeus(self):
         fandom_name = 'Blood of Zeus (Cartoon)'
         f = open("resources/" + fandom_name + "/raw/works.json")
         d = json.load(f)
         f.close()
         # TODO: Why won't path work normally here? Had to get absolute path
-        ext.process_works_file(d, fandom_name, "./resources", "/")
+        ext.process_works_file(d, fandom_name)
         # raw_count = self.count_character_raw("Seraphim", fandom_name)
         # processed_count = self.count_character_processed("Seraphim", fandom_name)
         # assert(raw_count == processed_count)

@@ -87,12 +87,11 @@ class test_database_utils(unittest.TestCase):
             "['cat', 'dog']": ['kitte/doge', 'purr/doggo', 'cat(cats)/dog(dogs)', 'pupper/kitte'],
             "['dog', 'dog']": ['doggo/doggo']})
 
-    def test_debug_zeus(self):
+    def test_process_zeus(self):
         fandom_name = 'Blood of Zeus (Cartoon)'
         f = open("resources/" + fandom_name + "/raw/works.json")
         d = json.load(f)
         f.close()
-        # TODO: Why won't path work normally here? Had to get absolute path
         ext.process_works_file(d, fandom_name)
         # raw_count = self.count_character_raw("Seraphim", fandom_name)
         # processed_count = self.count_character_processed("Seraphim", fandom_name)
@@ -113,6 +112,16 @@ class test_database_utils(unittest.TestCase):
         # raw_count = self.count_character_raw("Dionysus", fandom_name)
         # processed_count = self.count_character_processed("Dionysus", fandom_name)
         # assert(raw_count == processed_count)
+
+    def test_dedup_zeus_tags(self):
+        fandom_name = 'Blood of Zeus (Cartoon)'
+        f = open("resources/" + fandom_name + "/raw/tags.json")
+        d = json.load(f)
+        print(len(d))
+        f.close()
+        dr = utils.dedup_dict(d)
+        print(len(dr))
+
 
     def count_character_raw(self, name, fandom_name):
         with open("resources/" + fandom_name + "/raw/works.json") as works:

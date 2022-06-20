@@ -11,9 +11,6 @@ from pathlib import Path
 
 class FandomAnalysisTools:
 
-    logger_analysis = logging.getLogger("analysis")
-    logging.basicConfig(level=LOG_LEVEL)
-
     VALID_CATEGORIES = []
     VALID_CHARACTERS = []
     VALID_TIME = []
@@ -21,10 +18,10 @@ class FandomAnalysisTools:
 
     def __init__(self, fandom_name):
         self.fandom = fandom_name
-        self.logger_analysis.info('Init analyzer.')
+        print('Init analyzer.')
 
     def plot_bars_time(self, data, character='all', category='all', time='month', rating='all'):
-        self.logger_analysis.info('Plotting data vs time ' + time)
+        print('Plotting data vs time ' + time)
         df = pd.DataFrame.from_dict(data, orient='index')
 
         df = self.select_for_character(df, character)
@@ -64,19 +61,19 @@ class FandomAnalysisTools:
         return df
 
     def plot_bars_tag(self, data):
-        self.logger_analysis.info('Plotting data versus a single tag')
+        print('Plotting data versus a single tag')
 
     def plot_stacked_bars(self, array_of_data, normalized=True):
-        self.logger_analysis.info('Plotting stacked bar from data array')
+        print('Plotting stacked bar from data array')
 
     def plot_pie_chart(self, data, colors):
-        self.logger_analysis.info('Plotting pie chart')
+        print('Plotting pie chart')
 
     def plot_star_graph(self, data, labels):
-        self.logger_analysis.info('Plotting star graph')
+        print('Plotting star graph')
 
     def plot_network(self, data, edge_count=3):
-        self.logger_analysis.info('Plotting full network')
+        print('Plotting full network')
 
     def prepare_analytics_folders(self):
         ppath = Path(ROOT_DIR + FILES_ROOT + self.fandom + '/plots')
@@ -181,7 +178,7 @@ class FandomAnalysisTools:
         df.columns = ["".join(x) for x in df.columns.ravel()]
         de_exc = df[is_small]
 
-        self.logger_analysis.info(de_exc.index)
+        print(de_exc.index)
 
         pd.set_option('display.max_rows', None)
         d1 = df_segmented.loc["Explicit"]['count']
@@ -209,7 +206,6 @@ class FandomAnalysisTools:
         d5['count_y'] = d5['count_y'] / df['count']
         d5 = d5.drop(de_exc.index)
 
-        self.logger_analysis.debug(df)
         # ax.bar(ind, d1, color='g')
         fig, ax = plt.subplots(figsize=(40, 9))
         fig.subplots_adjust(bottom=0.3)
@@ -247,7 +243,7 @@ class FandomAnalysisTools:
         is_large = df['Fanfic Counts'] > 1
         pd.set_option('display.max_rows', None)
         df = df[is_large]
-        self.logger_analysis.debug(df)
+        print(df)
         plt.rc('font', size=8)
         plt.rc('axes', titlesize=8)
         df.plot(x='Ships', kind='bar', figsize=(20, 9))
@@ -518,7 +514,7 @@ class FandomAnalysisTools:
             d = json.load(json_file)
             for val in d.values():
                 val["main_characters"] = self.get_main_characters(val['characters'], val["first_page"] + val['title'])
-                self.logger_analysis.debug(val['title'] + "------" + str(val['main_characters']))
+                print(val['title'] + "------" + str(val['main_characters']))
             with open('works.json', 'w') as json_file:
                 json.dump(d, json_file)
 
@@ -626,21 +622,22 @@ class FandomAnalysisTools:
         char_df = df_filtered['characters'].explode().value_counts().rename_axis('Characters').reset_index(
             name='Fanfic Counts')
         links = 4
-        # if ficcount > 150:
-        #     links = 2
-        # if ficcount < 150:
-        #     links = 3
-        # if ficcount < 100:
-        #     links = 4
-        # if ficcount < 70:
-        #     links = 5
-        # if ficcount < 40:
-        #     links = 3
-        # if ficcount < 20:
-        #     links = 2
+        if ficcount > 150:
+            links = 2
+        if ficcount < 150:
+            links = 3
+        if ficcount < 100:
+            links = 4
+        if ficcount < 70:
+            links = 5
+        if ficcount < 40:
+            links = 3
+        if ficcount < 20:
+            links = 2
         char_df = char_df.head(min(links, char_df.shape[0] - 1))
         chars = list(char_df['Characters'].values)
-        chars.remove(char)
+        if (char in chars):
+            chars.remove(char)
         return chars
 
     def build_rel_dictionary(self, d):
@@ -695,7 +692,7 @@ class FandomAnalysisTools:
         df = df[is_large]
         charlist = df['Characters'].values
         for char in charlist:
-            self.logger_analysis.info('Plotting all for ' + char)
+            print('Plotting all for ' + char)
             self.plot_new_char_works_count_by_month(d, char, False)
             self.plot_char_shipping(d, char, False)
             self.plot_char_common_appearances(d, char, False)

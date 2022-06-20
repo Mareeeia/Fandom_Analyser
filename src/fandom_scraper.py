@@ -14,21 +14,19 @@ import logging
 
 
 class Fandom:
-    
-    logger_fandom = logging.getLogger("fandom")
-    logging.basicConfig(level=LOG_LEVEL)
-    
+
     def __init__(self, fandom_name):
         self.fandom = fandom_name
         self.soup_works = self.request("https://archiveofourown.org/tags/%s/works?page=1" % (fandom_name))
-        self.logger_fandom.info("https://archiveofourown.org/tags/%s/works?page=1" % (fandom_name))
+        print("https://archiveofourown.org/tags/%s/works?page=1" % (fandom_name))
         self.loaded_page = 1
         self.soup_profile = self.request("https://archiveofourown.org/tags/%s/profile" % fandom_name)
 
     @property
     def works(self):
-        n = str(self.soup_works.find("h2", {'class': 'heading'})).strip().split(" ")
-        return int(n[8])
+        header = str(self.soup_works.find("h2", {'class': 'heading'}))
+        match = re.search('(\\d+) Works in', header)
+        return int(match.group(1))
 
     @property
     def npages(self):
@@ -62,20 +60,20 @@ class Fandom:
     #     pagecount = (self.works - 1) // 20
     #     works_list = {}
     #     for i in range(1, pagecount):
-    #         self.logger_fandom.info("Currently fetching titles page: ", i)
+    #         print("Currently fetching titles page: ", i)
     #         titles = self.get_work_list_page(i)
     #         works_list.update(titles)
     #         if i % 10 == 0:
-    #             self.logger_fandom.info("Sleeping 120 sec to avoid trouble")
+    #             print("Sleeping 120 sec to avoid trouble")
     #             time.sleep(120)
     #     return works_list
 
     def get_full_works_metadata(self):
         pagecount = math.ceil(self.works / 20.0)
-        self.logger_fandom.info("Fandom contains " + str(self.works) + " works in " + str(pagecount) + " pages.")
+        print("Fandom contains " + str(self.works) + " works in " + str(pagecount) + " pages.")
         works_dict = {}
         for i in range(1, pagecount + 1):
-            self.logger_fandom.info("Currently fetching titles page: " + str(i))
+            print("Currently fetching titles page: " + str(i))
             metadatas = self.get_works_metadata_page(i)
             works_dict.update(metadatas)
         return works_dict
@@ -104,11 +102,11 @@ class Fandom:
     #     works_full = {}
     #     for id in works_list:
     #         sleepcount = sleepcount + 1
-    #         self.logger_fandom.info("Fetching work: ", works_list[id])
+    #         print("Fetching work: ", works_list[id])
     #         wrk = Work(int(id))
     #         works_full[works_list[id]] = wrk.work_properties
     #         if sleepcount % 40 == 0:
-    #             self.logger_fandom.info("Sleeping 300 sec to avoid trouble")
+    #             print("Sleeping 300 sec to avoid trouble")
     #             time.sleep(360)
     #     return works_full
 
@@ -118,7 +116,7 @@ class Fandom:
         try:
             title = title.a.string
         except:
-            self.logger_fandom.warn('Warning: Work id ' + id + ' has no displayed title.')
+            print('Warning: Work id ' + id + ' has no displayed title.')
             title = "Untitled"
         return str(title).strip()
 
@@ -136,7 +134,7 @@ class Fandom:
             hits = str(soup.find("dd", {'class': 'hits'}))
             return int(self.str_format(re.findall(r'\d+', hits)[0]))
         except:
-            self.logger_fandom.warn('Warning: Work id ' + id + ' has no displayed hits.')
+            print('Warning: Work id ' + id + ' has no displayed hits.')
             return 1
 
     # Get
@@ -156,7 +154,7 @@ class Fandom:
             words = soup.find("dd", {'class': 'words'})
             return int(self.str_format(words.string))
         except:
-            self.logger_fandom.warn('Warning: Work id ' + id + ' has no displayed word count')
+            print('Warning: Work id ' + id + ' has no displayed word count')
             return 0
 
     # Get
@@ -275,14 +273,12 @@ class Fandom:
         return language
 
     def get_all_fandom_dicts(self):
-        self.fandom_page = self.request(self.soup_profile)
         self.get_all_fandom_characters()
         self.get_all_fandom_ships()
         self.get_all_fandom_tags()
 
     def get_all_fandom_characters(self, chars=[]):
-        self.logger_fandom.info(
-            "Scraping characters from fandom page. We do this to ensure all versions of a character name count as the same character.")
+        print("Scraping characters from fandom page. We do this to ensure all versions of a character name count as the same character.")
         characters = {}
         if len(chars) == 0:
             chars = self.fandom_page.find("div", {"class": "characters listbox group"})
@@ -290,7 +286,7 @@ class Fandom:
             characters[char] = self.get_character_variants(char)
             self.progress(i, len(chars))
 
-        self.logger_fandom.info("Finished getting %i characters." % (len(characters)))
+        print("Finished getting %i characters." % (len(characters)))
         return characters
 
     def get_character_variants(self, char):
@@ -307,14 +303,14 @@ class Fandom:
         return char.strip()
 
     def get_all_fandom_ships(self, ships=[]):
-        self.logger_fandom.info(
+        print(
             "Scraping ships from fandom page. We do this to ensure all versions of a ship name count as the same ship.")
         relationships = {}
         if len(ships) == 0:
             ships = self.fandom_page.find("div", {"class": "relationships listbox group"})
         for ship in ships:
             relationships[ship] = self.get_ship_variants(ship)
-        self.logger_fandom.info("Finished getting %i ships." % (len(relationships)))
+        print("Finished getting %i ships." % (len(relationships)))
         return relationships
 
     def get_ship_variants(self, ship):
@@ -334,7 +330,7 @@ class Fandom:
         return tag.strip()
 
     def get_all_fandom_tags(self, tags=[]):
-        self.logger_fandom.info(
+        print(
             "Scraping freeform tags from fandom page. We do this to ensure all versions of a tag count as the same tag.")
         tags_dict = {}
         if len(tags) == 0:
@@ -342,7 +338,7 @@ class Fandom:
         for i, tag in enumerate(tags):
             tags_dict[tag] = self.get_tag_variants(tag)
             self.progress(i, len(tags))
-        self.logger_fandom.info("Finished getting %i tags." % (len(tags_dict)))
+        print("Finished getting %i tags." % (len(tags_dict)))
         return tags_dict
 
     def get_tag_variants(self, tag):
@@ -372,7 +368,7 @@ class Fandom:
     def request(self, url):
         # for i in range(10):
         #     r = Fandom.request_with_tor('http://httpbin.org/ip')
-        #     self.logger_fandom.info(r.text)
+        #     print(r.text)
         retries = 1
         success = False
         while not success:
@@ -383,9 +379,9 @@ class Fandom:
                 success = True
                 return soup
             except Exception as e:
-                self.logger_fandom.info(e)
+                print(e)
                 wait = retries * 60
-                self.logger_fandom.info('Oops, we sent too many requests to Ao3! Waiting %s secs and re-trying...' % wait)
+                print('Oops, we sent too many requests to Ao3! Waiting %s secs and re-trying...' % wait)
                 sys.stdout.flush()
                 time.sleep(wait)
                 retries += 1

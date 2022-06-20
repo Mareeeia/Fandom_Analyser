@@ -3,11 +3,7 @@ import logging
 from src.params.folder_params import *
 
 
-logger_dedup = logging.getLogger("dedup")
-logging.basicConfig(level=LOG_LEVEL)
-
 def dedup_array(array):
-    
     res = []
     for name in array:
         if name not in res:
@@ -22,7 +18,7 @@ def dedup_dict(tag_dict):
         if overlap and main != key:
             tag_dict[main].extend(overlap)
             junk.extend(overlap)
-    logger_dedup.info("Duplicate items found and will be deleted: " + str(junk))
+    print("Duplicate items found and will be deleted: " + str(junk))
     for entry in junk:
         if entry in tag_dict.keys():
             tag_dict.pop(entry)
@@ -58,6 +54,9 @@ def find_overlap(key_isdup, dict):
     for entry in overlap:
         if entry != main:
             filt_overlap.append(entry)
+    if filt_overlap:
+        print(key_isdup)
+        print(filt_overlap)
     return filt_overlap, main
 
 

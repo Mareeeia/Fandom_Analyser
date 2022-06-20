@@ -4,7 +4,7 @@ ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../..'))
 
 FILES_ROOT = "/fandom_extracted_data/"
 
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'WARN'
 
 RAW_CHARACTERS = "/raw/characters.json"
 

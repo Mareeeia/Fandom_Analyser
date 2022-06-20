@@ -10,6 +10,7 @@ import math
 import sys
 from stem import Signal
 from stem.control import Controller
+import pprint
 import logging
 
 
@@ -308,8 +309,9 @@ class Fandom:
         relationships = {}
         if len(ships) == 0:
             ships = self.fandom_page.find("div", {"class": "relationships listbox group"})
-        for ship in ships:
+        for i, ship in enumerate(ships):
             relationships[ship] = self.get_ship_variants(ship)
+            self.progress(i, len(ships))
         print("Finished getting %i ships." % (len(relationships)))
         return relationships
 
@@ -373,7 +375,7 @@ class Fandom:
         success = False
         while not success:
             try:
-                req = Fandom.request_with_tor(url)
+                req = self.request_with_soup(url)
                 content = req.content
                 soup = BeautifulSoup(content, "html.parser")
                 success = True
@@ -398,6 +400,10 @@ class Fandom:
         req = session.get(url, headers=headers, timeout=30)
         Fandom.renew_connection()
         return req
+
+    @staticmethod
+    def request_with_soup(url):
+        return requests.get(url)
 
     @staticmethod
     def renew_connection():

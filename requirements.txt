@@ -4,3 +4,5 @@ networkx~=2.5
 requests~=2.25.0
 beautifulsoup4~=4.9.3
 stem~=1.8.0
+Flask==2.1.2
+pysocks~=1.7.1

@@ -12,6 +12,7 @@ from pathlib import Path
 # 4. Re-run another scrape to build tags database
 
 def extract_and_process(fandom_name: str):
+    print(fandom_name)
     fnd, p = make_fandom_vars(fandom_name)
     extract_works_metadata(fnd, p)
     get_tags(fnd, fandom_name)
@@ -20,13 +21,14 @@ def extract_and_process(fandom_name: str):
     process_data_files(fandom_name)
 
 
-def extract_works_metadata(fandom, p):
-    # TODO: make folders when needed
-    dict = fandom.get_full_works_metadata()
-    dict = utils.ships_to_chars(dict)
+def extract_works_metadata(fandom, p) -> dict:
+    # TODO: put an option to avoid deeep scrape
+    works_dict = fandom.get_full_works_metadata()
+    works_dict = utils.ships_to_chars(works_dict)
     p = Path(p / 'raw')
     with open((p / 'works.json'), 'w') as f:
-        json.dump(dict, f)
+        json.dump(works_dict, f)
+    return works_dict
 
 
 def make_fandom_vars(fandom_name):

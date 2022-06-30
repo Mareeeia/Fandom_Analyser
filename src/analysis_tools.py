@@ -224,14 +224,15 @@ class FandomAnalysisTools:
         plt.savefig('fandom_extracted_data/' + self.fandom + '/plots/plot_chars_rating.png')
         plt.show()
 
-    def plot_works_count_by_character(self, d):
+    def plot_works_count_by_character(self, d, cutoff = 0):
         df = pd.DataFrame.from_dict(d).T
         df = df['characters'].explode().value_counts().rename_axis('Characters').reset_index(name='Fanfic Counts')
-        is_large = df['Fanfic Counts'] > 0
+        is_large = df['Fanfic Counts'] > cutoff
+        df = df[is_large]
         plt.rc('font', size=8)
         plt.rc('axes', titlesize=8)
         df.plot(x='Characters', kind='bar', figsize=(20, 8))
-        plt.axhline(y=df[is_large]['Fanfic Counts'].mean(), color='r', linestyle='-')
+        plt.axhline(y=df['Fanfic Counts'].mean(), color='r', linestyle='-')
         plt.draw()
         plt.savefig(ROOT_DIR + FILES_ROOT + self.fandom + '/plots/plot_works_count_by_character.png')
         plt.show()
@@ -640,12 +641,12 @@ class FandomAnalysisTools:
             chars.remove(char)
         return chars
 
-    def build_rel_dictionary(self, d):
+    def build_rel_dictionary(self, d, cutoff=0):
         df = pd.DataFrame.from_dict(d).T
         df['hits'] = df['hits'].astype(float)
         df = df.explode("characters")[["characters", "hits"]].groupby("characters").agg(["count", "mean"])
         df = df['hits'].sort_values(by='mean')
-        is_large = df['count'] > 0
+        is_large = df['count'] > cutoff
         df = df[is_large]
         charlist = list(df.index)
         char_dict = {}

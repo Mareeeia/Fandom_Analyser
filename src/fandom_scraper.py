@@ -3,14 +3,12 @@ from datetime import date
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
-from src.params.folder_params import *
 import time
 import re
 import math
 import sys
 from stem import Signal
 from stem.control import Controller
-import pprint
 import logging
 
 
@@ -52,9 +50,13 @@ class Fandom:
             self.loaded_page = page
         beautiful_soup = self.soup_works.find("ol", {'class': 'work index group'})
         works = {}
-        for work in beautiful_soup.find_all("li", {'role': 'article'}):
-            id = self.str_format(work['id'].split("_")[-1])
-            works[int(id)] = self.get_work_metadata(work, id)
+        try:
+            for work in beautiful_soup.find_all("li", {'role': 'article'}):
+                id = self.str_format(work['id'].split("_")[-1])
+                works[int(id)] = self.get_work_metadata(work, id)
+        except:
+            print(len(self.soup_works))
+            print(str(self.soup_works))
         return works
 
     # def get_full_works_titles(self):
@@ -373,20 +375,29 @@ class Fandom:
         #     print(r.text)
         retries = 1
         success = False
-        while not success:
+        while not success and retries < 6:
             try:
                 req = self.request_with_soup(url)
                 content = req.content
                 soup = BeautifulSoup(content, "html.parser")
-                success = True
+                if str(soup) is not "Retry Later" and "Retry" not in str(soup) and len(str(soup)) > 200:
+                    success = True
+                else:
+                    self.wait_to_retry(retries)
+                    retries += 1
                 return soup
             except Exception as e:
                 print(e)
-                wait = retries * 60
-                print('Oops, we sent too many requests to Ao3! Waiting %s secs and re-trying...' % wait)
-                sys.stdout.flush()
-                time.sleep(wait)
+                self.wait_to_retry(retries)
                 retries += 1
+
+    @staticmethod
+    def wait_to_retry(retries):
+        wait = retries * 60
+        print('Oops, we sent too many requests to Ao3! Waiting %s secs and re-trying...' % wait)
+        sys.stdout.flush()
+        time.sleep(wait)
+
 
     @staticmethod
     def request_with_tor(url):

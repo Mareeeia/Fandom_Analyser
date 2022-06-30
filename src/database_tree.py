@@ -1,11 +1,13 @@
+"""Currently not in use."""
+
 from anytree import Node, RenderTree
 from typing import List
 import json
 
 from src.params.folder_params import *
 
-class DatabaseTree:
 
+class DatabaseTree:
     # def __main__(self):
     #     fandom_name = 'Blood of Zeus (Cartoon)'
     #     with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_TAGS) as f_t:
@@ -43,13 +45,10 @@ class DatabaseTree:
                 for root in root_list:
                     self.dfs_insert(key, tag_dict[key], root)
 
-    def dfs_insert(self, key: str, value: List[str], root:Node):
+    def dfs_insert(self, key: str, value: List[str], root: Node):
         for child in root.children:
             if child.name == key:
                 child.children = self.make_nodes(value)
                 return
             self.dfs_insert(key, value, child)
         return
-
-
-

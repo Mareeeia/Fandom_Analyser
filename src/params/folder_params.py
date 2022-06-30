@@ -22,3 +22,5 @@ RAW_TAGS = "/raw/tags.json"
 
 PROCESSED_TAGS = "/processed/tags.json"
 
+BUCKET_NAME = "scraped_data_fanfic_analyser"
+

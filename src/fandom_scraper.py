@@ -1,4 +1,5 @@
 import datetime
+import json
 from datetime import date
 from datetime import datetime
 import requests
@@ -11,6 +12,8 @@ from stem import Signal
 from stem.control import Controller
 import logging
 
+from src.params.folder_params import *
+
 
 class Fandom:
 
@@ -20,6 +23,8 @@ class Fandom:
         print("https://archiveofourown.org/tags/%s/works?page=1" % (fandom_name))
         self.loaded_page = 1
         self.soup_profile = self.request("https://archiveofourown.org/tags/%s/profile" % fandom_name)
+        with open(ROOT_DIR + COMBINED_TAGS) as tags_file:
+            self.tags_dict = json.load(tags_file)
 
     @property
     def works(self):
@@ -346,6 +351,9 @@ class Fandom:
         return tags_dict
 
     def get_tag_variants(self, tag):
+        if tag in self.tags_dict.keys():
+            print("Tag %s found in existing files" % tag)
+            return self.tags_dict[tag]
         tag_page = self.request("https://archiveofourown.org/tags/%s" % (tag))
         variants_div = tag_page.find("div", {"class": "synonym listbox group"})
         variants = []

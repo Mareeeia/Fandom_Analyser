@@ -1,7 +1,7 @@
 from flask import Flask
 import sys
 import os
-from flask import request, jsonify
+from flask import request
 
 sys.path.insert(0, '/Users/mariamilusheva/code/Fandom_Analyser/src')
 sys.path.insert(0, '/Users/mariamilusheva/code/Fandom_Analyser')
@@ -15,11 +15,21 @@ app = Flask(__name__)
 
 
 @app.route('/api/v1/fandom', methods=['GET'])
-def hello_world():
+def extract_fandom():
     works_dict = {}
     bucket = init_storage()
     if 'id' in request.args:
         id = request.args['id']
-        fnd, p = make_fandom_vars(id)
-        works_dict = extract_works_metadata(fnd, p, bucket)
+        works_dict = extract_and_process(id, bucket)
     return works_dict
+
+
+@app.route('/api/v1/fandom/process', methods=['GET'])
+def process_responses():
+    bucket = init_storage()
+    if 'id' in request.args:
+        id = request.args['id']
+        process_data_files(id, bucket)
+        process_works_file(id, bucket)
+    return "Success"
+

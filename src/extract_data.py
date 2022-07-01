@@ -15,12 +15,13 @@ from pathlib import Path
 def extract_and_process(fandom_name: str, bucket):
     print(fandom_name)
     fnd, p = make_fandom_vars(fandom_name)
-    extract_works_metadata(fnd, p, bucket)
+    works = extract_works_metadata(fnd, p, bucket)
     get_tags(fnd, fandom_name, bucket)
     get_chars(fnd, fandom_name, bucket)
     get_ships(fnd, fandom_name, bucket)
     process_data_files(fandom_name, bucket)
-
+    process_works_file(fandom_name, bucket)
+    return works
 
 def extract_works_metadata(fandom, p, bucket) -> dict:
     # TODO: put an option to avoid deeep scrape
@@ -55,16 +56,12 @@ def process_data_files(fandom_name, bucket):
         d = utils.dedup_char_fandom(d)
         save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_CHARACTERS,
                                    fandom_name + PROCESSED_CHARACTERS, d, bucket)
-        # with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_CHARACTERS, 'w') as w_c:
-        #     json.dump(d, w_c)
     print("Processing tag names to minimise duplication.")
     with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_TAGS) as f_t:
         d = json.load(f_t)
         d = utils.dedup_dict(d)
         save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_TAGS,
                                    fandom_name + PROCESSED_TAGS, d, bucket)
-        # with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_TAGS, 'w') as w_t:
-        #     json.dump(d, w_t)
     print("Processing relationships to minimise duplication.")
     with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_CHARACTERS) as f_c:
         char_dict = json.load(f_c)
@@ -74,22 +71,20 @@ def process_data_files(fandom_name, bucket):
             d = utils.dedup_ship_fandom(d, char_dict)
             save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_SHIPS,
                                        fandom_name + PROCESSED_SHIPS, d, bucket)
-            # with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_SHIPS, 'w') as w_s:
-            #     json.dump(d, w_s)
 
 
-def process_works_file(d, fandom_name, bucket):
-    with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_CHARACTERS) as f_c:
-        with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_TAGS) as f_t:
-            with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_SHIPS) as f_s:
-                char_dict = json.load(f_c)
-                tag_dict = json.load(f_t)
-                ship_dict = json.load(f_s)
-                utils.process_dict(d, char_dict, tag_dict, ship_dict)
-                save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_WORKS,
-                                           fandom_name + PROCESSED_WORKS, d, bucket)
-                # with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_WORKS, 'w') as w_w:
-                #     json.dump(d, w_w)
+def process_works_file(fandom_name, bucket):
+    with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_WORKS) as raw_works:
+        with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_CHARACTERS) as f_c:
+            with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_TAGS) as f_t:
+                with open(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_SHIPS) as f_s:
+                    char_dict = json.load(f_c)
+                    tag_dict = json.load(f_t)
+                    ship_dict = json.load(f_s)
+                    d = json.load(raw_works)
+                    utils.process_dict(d, char_dict, tag_dict, ship_dict)
+                    save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + PROCESSED_WORKS,
+                                               fandom_name + PROCESSED_WORKS, d, bucket)
 
 
 def get_chars(fnd, fandom_name, bucket, count=0):
@@ -99,8 +94,6 @@ def get_chars(fnd, fandom_name, bucket, count=0):
         chars = fnd.get_all_fandom_characters(chars_raw)
         save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + RAW_CHARACTERS,
                                    fandom_name + RAW_CHARACTERS, chars, bucket)
-        # with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_CHARACTERS, 'w') as f_c:
-        #     json.dump(chars, f_c)
 
 
 def get_tags(fnd, fandom_name, bucket, count=0):
@@ -110,8 +103,6 @@ def get_tags(fnd, fandom_name, bucket, count=0):
         tags = fnd.get_all_fandom_tags(tags_raw)
         save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + RAW_TAGS,
                                    fandom_name + RAW_TAGS, tags, bucket)
-        # with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_TAGS, 'w') as f_t:
-        #     json.dump(tags, f_t)
 
 
 def get_ships(fnd, fandom_name, bucket, count=0):
@@ -121,8 +112,6 @@ def get_ships(fnd, fandom_name, bucket, count=0):
         ships = fnd.get_all_fandom_ships(ships_raw)
         save_dict_file_to_location(ROOT_DIR + FILES_ROOT + fandom_name + RAW_SHIPS,
                                    fandom_name + RAW_SHIPS, ships, bucket)
-        # with open(ROOT_DIR + FILES_ROOT + fandom_name + RAW_SHIPS, 'w') as f_t:
-        #     json.dump(ships, f_t)
 
 
 def get_top_characters(d, count=0):

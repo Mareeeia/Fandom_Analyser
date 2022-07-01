@@ -87,6 +87,10 @@ class test_database_utils(unittest.TestCase):
             "['cat', 'dog']": ['kitte/doge', 'purr/doggo', 'cat(cats)/dog(dogs)', 'pupper/kitte'],
             "['dog', 'dog']": ['doggo/doggo']})
 
+    def test_combine_tags(self):
+        utils.combine_tag_files()
+        assert(True)
+
     def test_process_zeus(self):
         fandom_name = 'Blood of Zeus (Cartoon)'
         f = open("resources/" + fandom_name + "/raw/works.json")
@@ -122,7 +126,6 @@ class test_database_utils(unittest.TestCase):
         dr = utils.dedup_dict(d)
         print(len(dr))
 
-
     def count_character_raw(self, name, fandom_name):
         with open("resources/" + fandom_name + "/raw/works.json") as works:
             d = json.load(works)
@@ -141,3 +144,4 @@ class test_database_utils(unittest.TestCase):
                 occurrences = work["characters"].count(name)
                 counter += occurrences
             return counter
+

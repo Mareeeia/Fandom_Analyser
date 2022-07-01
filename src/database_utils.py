@@ -1,3 +1,4 @@
+import json
 import re
 import logging
 from src.params.folder_params import *
@@ -161,3 +162,17 @@ def process_dict(d, char_dict, tag_dict, ship_dict):
         d[work]['tags'] = standardize_tags(d[work]['tags'], tag_dict)
         d[work]['relationships'] = standardize_ships(d[work]['relationships'], ship_dict)
     return d
+
+
+def combine_tag_files():
+    files = os.listdir(ROOT_DIR + FILES_ROOT)
+    total_tags_dict: dict = {}
+    for filename in files:
+        print(filename)
+        if "DS_Store" not in filename:
+            with open(ROOT_DIR + FILES_ROOT + filename + "/processed/tags.json") as tags:
+                tag = json.load(tags)
+                total_tags_dict.update(tag)
+
+    with open(ROOT_DIR + COMBINED_TAGS, 'w') as tag_file:
+        json.dump(total_tags_dict, tag_file)

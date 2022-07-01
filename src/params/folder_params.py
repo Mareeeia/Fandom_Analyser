@@ -24,3 +24,5 @@ PROCESSED_TAGS = "/processed/tags.json"
 
 BUCKET_NAME = "scraped_data_fanfic_analyser"
 
+COMBINED_TAGS = "/combined_tags/tags.json"
+

@@ -18,6 +18,8 @@ RAW_WORKS = "/raw/works.json"
 
 PROCESSED_WORKS = "/processed/works.json"
 
+PROCESSED_TEMP = "/processed/temp.json"
+
 RAW_TAGS = "/raw/tags.json"
 
 PROCESSED_TAGS = "/processed/tags.json"

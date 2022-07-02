@@ -6,7 +6,7 @@ from flask import request
 sys.path.insert(0, '/Users/mariamilusheva/code/Fandom_Analyser/src')
 sys.path.insert(0, '/Users/mariamilusheva/code/Fandom_Analyser')
 from src.gc_util import init_storage
-
+from src.bigquery_upload import upload_json_to_table
 from src.extract_data import *
 
 credential_path = "/Users/mariamilusheva/code/Fandom_Analyser/fanfic-an-f719b5feb60f.json"
@@ -31,5 +31,13 @@ def process_responses():
         id = request.args['id']
         process_data_files(id, bucket)
         process_works_file(id, bucket)
+    return "Success"
+
+
+@app.route('/api/v1/fandom/upload', methods=['GET'])
+def upload():
+    if 'id' in request.args:
+        id = request.args['id']
+        upload_json_to_table(id)
     return "Success"
 
